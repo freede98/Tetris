@@ -1,11 +1,11 @@
 Screen
-_____________               Button_1  Pause
+_____________               Button_1  Turn_Clockwise
 [           ]
-[           ]               Button_2  Turn_Clockwise
+[           ]               Button_2  Jump_Right
 [           ]
-[           ]               Button_3  Jump_Right
+[           ]               Button_3  Jump_Left
 [           ]
-[           ]               Buttonn_4 Jump_Left
+[           ]               Buttonn_4 Drop_down
 [           ]
 [           ]
 [___________]
