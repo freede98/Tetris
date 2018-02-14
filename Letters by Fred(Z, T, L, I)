@@ -1,0 +1,63 @@
+const uint8_t const Ztetra1[] = {
+	255, 255, 243, 243, 195, 195, 207, 207,
+};
+
+const uint8_t const Ztetra2[] = {
+	255, 255, 195, 195, 240, 240, 255, 255,
+};
+
+const uint8_t const Ztetra3[] = {
+	255, 255, 252, 252, 240, 240, 243, 243,
+};
+
+const uint8_t const Ztetra4[] = {
+	255, 255, 195, 195, 240, 240, 255, 255,
+};
+
+const uint8_t const Ttetra1[] = {
+	255, 255, 243, 243, 240, 240, 243, 243,
+};
+
+const uint8_t const Ttetra2[] = {
+	255, 255, 192, 192, 243, 243, 255, 255,
+};
+
+const uint8_t const Ttetra3[] = {
+	255, 255, 243, 243, 195, 195, 243, 243,
+};
+
+const uint8_t const Ttetra4[] = {
+	255, 255, 243, 243,  192, 192, 255, 255,
+};
+
+const uint8_t const Ltetra1[] = {
+	255, 255, 255, 255, 192, 192, 207, 207,
+};
+
+const uint8_t const Ltetra2[] = {
+	255, 255, 195, 195, 243, 243, 243, 243,
+};
+
+const uint8_t const Ltetra3[] = {
+	255, 255, 252, 252, 192, 192, 255, 255,
+};
+
+const uint8_t const Ltetra4[] = {
+	255, 255, 243, 243, 243, 243, 240, 240,
+};
+
+const uint8_t const Itetra1[] = {
+	255, 255, 0, 0, 255, 255, 255, 255,
+};
+
+const uint8_t const Itetra2[] = {
+	243, 243, 243, 243, 243, 243, 243, 243,
+};
+
+const uint8_t const Itetra3[] = {
+	255, 255, 255, 255, 0, 0, 255, 255,
+};
+
+const uint8_t const Itetra4[] = {
+	207, 207, 207, 207, 207, 207, 207, 207,
+};
