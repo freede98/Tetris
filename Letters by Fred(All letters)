@@ -62,7 +62,11 @@ const uint8_t const Itetra4[] = {
 	207, 207, 207, 207, 207, 207, 207, 207,
 };
 
-const uint8_t const tetras[] = {
+const uint8_t const Stetra1[] = {
+	240, 240, 195, 195, 255, 255, 255, 255
+};
+
+const uint8_t const Stetra2[] = {
 	243, 243, 243, 240, 240, 252, 252, 255
 };
 
@@ -70,6 +74,18 @@ const uint8_t const square[] = {
 	255, 255, 240, 240, 240, 240, 255, 255
 };
 
-const uint8_t const Jtetra[] = {
+const uint8_t const Jtetra1[] = {
 	240, 240, 243, 243, 243, 243, 243, 243
+};
+
+const uint8_t const Jtetra2[] = {
+	0, 0, 252, 252, 255, 255, 255, 255
+};
+
+const uint8_t const Jtetra3[] = {
+	252, 252, 252, 252, 252, 252, 240, 240
+};
+
+const uint8_t const Jtetra4[] = {
+	207, 207, 192, 192, 255, 255, 255, 255
 };
