@@ -8,6 +8,11 @@ initialize( void )
   return;
 }
 
+startgame( void )
+{
+
+}
+
 main(void)
 {
   if(IFS(0) & 0x100)
