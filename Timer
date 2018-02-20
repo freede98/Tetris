@@ -117,10 +117,10 @@ initialize( void )
 			spi_send_recv(~data[i*256 + j]); //i*32
 	}
 */
-
 startgame( void )
 {
   //random kloss kallas
+
 
 }
 
