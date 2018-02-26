@@ -1,0 +1,26 @@
+  display_init();
+	display_update();
+
+	int x = 96;
+	while( x > 0)
+	{
+		display_image(x, icon);
+		x = x - 32;
+		delay( 3000000 );
+	}
+	display_image(x, icon);
+	delay( 2600000 );
+	display_image(48, icon);
+	delay( 2200000 );
+	display_image(16, icon);
+	delay( 1800000 );
+	display_image(90, icon);
+	delay( 1400000 );
+	display_image(64, icon);
+	delay( 1000000 );
+	display_image(32, icon);
+	delay( 8000000 );
+
+	display_string(0, " BAM!");
+	display_update();
+	display_image(48, icon);
