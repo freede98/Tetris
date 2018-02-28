@@ -4,5 +4,5 @@
 
 #3 Random() function
 
-At lunch hour, ask about "time.h" in relation to msys compile, and artefacts around falling blocks. 
+At lunch hour, ask about "time.h" and "IOShieldOled.h" in relation to msys compile, and artefacts around falling blocks. 
 Also if we should have our own method of drawing graphics.
