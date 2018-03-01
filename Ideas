@@ -1,0 +1,1 @@
+Button moves stuff left,right,up,down. Shift, IF(... & 0x40) add ox80
