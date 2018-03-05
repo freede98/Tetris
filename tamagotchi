@@ -1,7 +1,5 @@
 #include <pic32mx.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define DISPLAY_VDD PORTFbits.RF6
 #define DISPLAY_VBATT PORTFbits.RF5
@@ -20,61 +18,54 @@
 
 volatile int * trise = (volatile int *) 0xbf886100;
 volatile int * porte = (volatile int *) 0xbf886110;
+
 int writeRow = 0;
+int emoindex = 0;
+int timecounter = 0;
 
 char textbuffer[4][16];
 
 static const uint8_t const empty_space[] = {
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-255,255,255,255,255,255,255,255,
-};
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,};
 
-const uint8_t const emoji[][64] = {{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-		63, 207, 247, 251, 237, 213, 238, 254, 254, 238, 213, 237, 251, 247, 207, 63,
-	  252, 243, 239, 221, 189, 186, 119, 119, 119, 119, 186, 189, 221, 239, 243, 252},
-	{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-			127, 143, 247, 251, 237, 237, 237, 254, 254, 237, 237, 237, 251, 247, 143, 127,
-		254, 241, 239, 223, 189, 189, 189, 125, 125, 189, 189, 189, 223, 239, 241, 254},
-	{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-			255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-			127, 143, 247, 251, 245, 229, 237, 254, 254, 237, 229, 245, 251, 247, 143, 127,
-		254, 241, 239, 223, 183, 187, 189, 125, 125, 189, 187, 183, 223, 239, 241, 254}};
+//smiley = 0			neutral = 1			angry = 2
 
-const uint8_t const smiley[] = {
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-	63, 207, 247, 251, 237, 213, 238, 254, 254, 238, 213, 237, 251, 247, 207, 63,
-  252, 243, 239, 221, 189, 186, 119, 119, 119, 119, 186, 189, 221, 239, 243, 252 };
-
-const uint8_t const neutral[] = { 127, 143, 247, 251, 237, 237, 237, 254, 254, 237, 237, 237, 251, 247, 143, 127,
-254, 241, 239, 223, 189, 189, 189, 125, 125, 189, 189, 189, 223, 239, 241, 254,};
-
-const uint8_t const angry[] = {127, 143, 247, 251, 245, 229, 237, 254, 254, 237, 229, 245, 251, 247, 143, 127,
-254, 241, 239, 223, 189, 187, 189, 125, 125, 189, 187, 189, 223, 239, 241, 254,};
+const uint8_t const emoticon[][64] = {
+	{0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0x3f, 0xcf, 0xf7, 0xfb, 0xed, 0xd5, 0xee, 0xfe, 0xfe, 0xee, 0xd5, 0xed, 0xfb, 0xf7, 0xcf, 0x3f,
+	0xfc, 0xf3, 0xef, 0xdd, 0xbd, 0xba, 0x77, 0x77, 0x77,0x77, 0xba, 0xbd, 0xdd, 0xef, 0xf3, 0xfc},
+	{0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0x7f, 0x8f, 0xf7, 0xfb, 0xed, 0xed, 0xed, 0xfe, 0xfe, 0xed, 0xed, 0xed, 0xfb, 0xf7, 0x8f, 0x7f,
+	0xfe, 0xf1, 0xef, 0xdf, 0xbd, 0xbd, 0xbd, 0x7d, 0x7d, 0xbd, 0xbd, 0xbd, 0xdf, 0xef, 0xf1, 0xfe},
+	{0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0x7f, 0x8f, 0xf7, 0xfb, 0xf5, 0xe5, 0xed, 0xfe, 0xfe, 0xed, 0xe5, 0xf5, 0xfb, 0xf7, 0x8f, 0x7f,
+	0xfe, 0xf1, 0xef, 0xdf, 0xb7, 0xbb, 0xbd, 0x7d, 0x7d, 0xbd, 0xbb, 0xb7, 0xdf, 0xef, 0xf1, 0xfe}};
 
 void delay(int cyc) {
 	int i;
@@ -86,27 +77,6 @@ uint8_t spi_send_recv(uint8_t data) {
 	SPI2BUF = data;
 	while(!(SPI2STAT & 0x01));
 	return SPI2BUF;
-}
-
-int timecounter = 0;
-
-void initialise_timer(){
-	T2CON = 0x70;
-	PR2 = (80000000 / 256) / 10;
-	TMR2 = 0;
-	T2CONSET = 0x8000;
-
-	PORTDINV = 0x0fe0;
-	//*trise = *trise & 0xff00;
-volatile int * trise = (volatile int*) 0xbf886100;
-	if(IFS(0) & 0x100)
-		{
-			timecounter += 1;
-			TMR2 = 0;
-			IFSCLR(0) = 0x0100;
-		}
-	volatile int * porte = (volatile int*) 0xbf886110;
-	*porte = 255;
 }
 
 void display_init() {
@@ -197,21 +167,35 @@ void display_update() {
 	}
 }
 
+void initialise_timer(){
+	T2CON = 0x70;
+	PR2 = (80000000 / 256) / 10;
+	TMR2 = 0;
+	T2CONSET = 0x8000;
+
+	PORTDINV = 0x0fe0;
+	*trise = *trise & 0xff00;
+	*porte = 0xff;
+
+	//return;
+}
+
 int getbtns(void){
   int buttons = (PORTD >> 5) & 0x07;
 
   return buttons;
 }
 
-int getsw( void )
-{
-	return PORTD >> 8 & 0xf;
-}
-
-int getbtn(void){
+int get1btn(void){
   int button = (PORTF >> 1) & 0x1;
 
   return button;
+}
+
+int getsw( void ){
+  int switches = (PORTD >> 8) & 0x0f;
+
+  return switches;
 }
 
 int main(void) {
@@ -249,138 +233,83 @@ int main(void) {
 	/* Turn on SPI */
 	SPI2CONSET = 0x8000;
 
-	 display_init();
-	 display_update();
-	 initialise_timer();
+display_init();
+display_update();
+initialise_timer();
 
-	 volatile int* push_buttons = (volatile int*) getbtns();
-	 volatile int* one_button = (volatile int*) getbtn();
-	 int swiitch = getsw();
-	 int i = 64;
+int i = 64;
+while(1) {
 
-	 while(i != 160) {
+volatile int* push_buttons = (volatile int*) getbtns();
+volatile int* one_button = (volatile int*) get1btn();
+volatile int* switches = (volatile int*) getsw();
 
-		 if(!(*push_buttons) && !(*one_button) && timecounter == 10)
-		 {
-				 *porte = 127;
-		 }
+if(IFS(0) & 0x100)
+	{
+		timecounter++;
+		IFS(0) = 0;
+	}
 
-	 if(swiitch == 0)
-	 {
-	 display_image(i, emoji[0]);
-	 if(*push_buttons & 0x4)
-	 {
-	 	display_image(i, emoji[0]);
-	 	delay(30000);
-	 	if(i == 0)
-	 		i = 128;
-	 	else
-	 		i--;
-	 	display_update();
-	 }
+//smiley = 0			neutral = 1			angry = 2
+if(1)
+	emoindex = 0;
 
-	 if(*one_button & 0x1)
-	 {
-	 	display_image(i, emoji[0]);
-	 	delay(30000);
-	 	if(i == 128)
-	 		i = 0;
-	 	else
-	 		i++;
-	 	display_update();
-	 }
+if(*switches & 0x1 || !(*porte & 0x10))
+	emoindex = 1;
 
-	 if(*push_buttons & 0x2)
-	 {
-	 	writeRow = 2;
-	 	display_update();
-	 }
+if(*switches & 0x2 || !(*porte & 0x2))
+	emoindex = 2;
 
-	 if(*push_buttons & 0x1)
-	 {
-	 	writeRow = 0;
-	 	display_update();
-	 }
-	 }
-/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
-	 if(swiitch & 0x1)
-	 {
-	 	display_image(i, emoji[1]);
-	 	if(*push_buttons & 0x4)
-	 	{
-	 		display_image(i, emoji[1]);
-	 		delay(30000);
-	 		if(i == 0)
-	 			i = 128;
-	 		else
-	 			i--;
-	 		display_update();
-	 	}
-
-	 	if(*one_button & 0x1)
-	 	{
-	 		display_image(i, emoji[1]);
-	 		delay(30000);
-	 		if(i == 128)
-	 			i = 0;
-	 		else
-	 			i++;
-	 		display_update();
-	 	}
-
-	 	if(*push_buttons & 0x2)
-	 	{
-	 		writeRow = 2;
-	 		display_update();
-	 	}
-
-	 	if(*push_buttons & 0x1)
-	 	{
-	 		writeRow = 0;
-	 		display_update();
-	 	}
-	 }
-/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
-	 if(swiitch & 0x2)
-	 {
-	 	display_image(i, emoji[2]);
-	 	if(*push_buttons & 0x4)
-	 	{
-	 		display_image(i, emoji[2]);
-	 		delay(30000);
-	 		if(i == 0)
-	 			i = 128;
-	 		else
-	 			i--;
-	 		display_update();
-	 	}
-
-	 	if(*one_button & 0x1)
-	 	{
-	 		display_image(i, emoji[2]);
-	 		delay(30000);
-	 		if(i == 128)
-	 			i = 0;
-	 		else
-	 			i++;
-	 		display_update();
-	 	}
-
-	 	if(*push_buttons & 0x2)
-	 	{
-	 		writeRow = 2;
-	 		display_update();
-	 	}
-
-	 	if(*push_buttons & 0x1)
-	 	{
-	 		writeRow = 0;
-	 		display_update();
-	 	}
-	 }
-	 /*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/
+if(!(*push_buttons) && !(*one_button) && timecounter > 9)
+{
+	*porte = *porte >> 1;
+	timecounter = 0;
 }
-	 		delay( 300000 );
-	 	return 0;
 
+if((*push_buttons || *one_button) &&  timecounter > 4)
+{
+	*porte = (*porte << 1) + 0x1;
+
+	timecounter = 0;
+}
+
+display_image(i, emoticon[emoindex]);
+if(*push_buttons & 0x4)
+{
+	display_image(i, emoticon[emoindex]);
+	delay(50000);
+	if(i == 0)
+		i = 128;
+	else
+		i--;
+	display_update();
+}
+
+if(*one_button & 0x1)
+{
+	display_image(i, emoticon[emoindex]);
+	delay(50000);
+	if(i == 128)
+		i = 0;
+	else
+		i++;
+	display_update();
+}
+
+if(*push_buttons & 0x2)
+{
+	writeRow = 2;
+	delay( 100000 );
+	display_update();
+}
+
+if(*push_buttons & 0x1)
+{
+	writeRow = 0;
+	delay( 100000 );
+	display_update();
+}
+}
+	for(;;) ;
+	return 0;
 }
