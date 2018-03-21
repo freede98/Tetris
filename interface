@@ -1,0 +1,21 @@
+#include <pic32mx.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+int interface()
+{
+	while(1)
+	{
+	volatile int* switches = (volatile int*) getsw();
+	volatile int* push_buttons = (volatile int*) getbtns();
+	display_init();
+	display_string(0, "food");
+	display_string(1, "weight 2g");
+	display_string(2, "age 8");
+	display_string(3, "points 12");
+	display_update();
+
+ 	}
+		for(;;) ;
+		return 0;
+}
