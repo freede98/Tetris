@@ -1,5 +1,3 @@
-//MAIN.C
-
 #include <pic32mx.h>
 #include <stdint.h>
 
@@ -27,7 +25,7 @@ int timecounter = 0;
 int enough = 0;
 int delayBurger = 0;
 int tickdown1 = 0;
-//int* something = 0;
+int foodCounter = 0;
 
 char textbuffer[4][16];
 
@@ -407,22 +405,7 @@ display_update();
 initialise_timer();
 
 int i = 64;
-display_string(1, "0123");
-//*foodCounter = '0';
-//*(foodCounter+1) = '1';
-//*(foodCounter + 2) = '2';
-char foodCounter[5];
-foodCounter[0] = '0';
-foodCounter[1] = foodCounter[0]++;
-foodCounter[2] = '2';
-//foodCounter = 0;
-display_string(0, foodCounter);
-
-//char* c = 0;
 while(1) {
-//*c = (char) 46;
-//*c = (char) *foodCounter;
-
 volatile int* push_buttons = (volatile int*) getbtns();
 volatile int* one_button = (volatile int*) get1btn();
 volatile int* switches = (volatile int*) getsw();
@@ -437,8 +420,8 @@ if(IFS(0) & 0x100)
 		tickdown1++;
 	}
 
-//if(tickdown1 > 100000 && *foodCounter > 49)
-	//*foodCounter--;
+if(tickdown1 > 10000000 && foodCounter > 0)
+	foodCounter--;
 
 //smiley = 0			neutral = 1			angry = 2
 if(1)
@@ -510,13 +493,10 @@ if(delayBurger > 0 && !(*switches & 0x8))
 
 if((writeRow == 0) && (i == 112) && delayBurger > 0){
 	delayBurger = 0;
-	//if(*foodCounter < '9'){
-		//delay(5000);
-		//*foodCounter++;}
-}
+	foodCounter++;}
 
 if(*switches & 0x1){
-	interface();
+	interface(foodCounter);
 }
 
 }
@@ -526,16 +506,49 @@ if(*switches & 0x1){
 }
 
 //INTERFACE
+
 #include <pic32mx.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-int interface()
+char foo[16];
+
+void convertToChar (char* letters,int number)
+{
+  int i = 0;
+  while (*letters){
+    foo[i] = *letters;
+    i++;
+    letters++;
+  }
+
+  int limit = i; //5
+
+  int size = number;
+
+  while (size > 0){
+    size = size / 10;
+    i++; //6
+  }
+
+  int carry = 0;
+  while( i >= limit ){
+    carry = number / 10;
+    foo[i] = (char) ((number % 10) + 48);
+    if (number == 0)
+      foo[i] = (char) 32;
+    i--;
+    number = carry;
+  }
+}
+
+int interface(int foodCounter)
 {
 	display_init();
-	display_string(0, "food");
+  convertToChar("food:" ,foodCounter);
+  display_string(0, foo);
 	display_string(1, "weight 2g");
-	display_string(2, "age 8");
+	display_string(2, "age ");
 	display_string(3, "points 12");
 	display_update();
 
