@@ -1,0 +1,30 @@
+void agetime(int life)
+{
+	initialise_timer();
+	int y = 1;
+	int timecounter = 0;
+
+	char* lifetime = age;
+
+	while(y < life)
+		{
+			if(IFS(0) & 0x100)
+				{
+					timecounter++;
+					IFS(0) = 0;
+					TMR2 = 0;
+				}
+
+	  	*lifetime = (char) y + 48;
+
+			if(timecounter = 0x6)
+				{
+				 display_string(2, lifetime);
+				 display_update();
+				 timecounter = 0;
+				}
+			y++;
+		 }
+
+   return;
+}
