@@ -1,9 +1,64 @@
-/*
-Show all letters
-Pick letters with a point symbol
-Moving the pointer picks a location in a char array
-Chosen letters are printed in 3 specific places
+#include <pic32mx.h>
+#include <stdint.h>
 
+int gameover(){
+  display_init();
+  display_string(0, "GAME OVER");
+  display_string(1, "25");
+  display_update();
+  delay(100000);
 
+  char alphabet[4][16] = {
+  {'>','A',' ','B',' ','C',' ','D',' ','E',' ','F',' ','G',' ','H'},
+  {' ','I',' ','J',' ','K',' ','L',' ','M',' ','N',' ','O',' ','P'},
+  {' ','Q',' ','R',' ','S',' ','T',' ','U',' ','V',' ','W',' ','X'},
+  {' ','Y',' ','Z',' ',' ',' ',' ',' ',' ',' ','_',' ','_',' ','_'}};
 
-*/
+  int y = 0;
+  int x = 0;
+
+  int pos = 11;
+  while(pos < 17){
+    display_string(0, alphabet[0]);
+    display_string(1, alphabet[1]);
+    display_string(2, alphabet[2]);
+    display_string(3, alphabet[3]);
+    volatile int* buttons = (volatile int*) getbtns();
+    volatile int* switches = (volatile int*) getsw();
+    if (*buttons & 0x8 && x > 0){
+      x -= 2;
+      alphabet[y][x] = '>';
+      alphabet[y][x+2] = ' ';
+      delay(500000);
+    }
+    if (*buttons & 0x1 && x < 14){
+      x += 2;
+      alphabet[y][x] = '>';
+      alphabet[y][x-2] = ' ';
+      delay(500000);
+    }
+    if (*buttons & 0x4 && y < 3){
+      y++;
+      alphabet[y][x] = '>';
+      alphabet[y-1][x] = ' ';
+      delay(500000);
+    }
+    if (*buttons & 0x2 && y > 0){
+      y--;
+      alphabet[y][x] = '>';
+      alphabet[y+1][x] = ' ';
+      delay(500000);
+    }
+    if (*switches & 0x4){
+      alphabet[3][pos] = alphabet[y][x+1];
+      pos += 2;
+      while(*switches & 0x4)
+        switches = (volatile int*)getsw();
+    }
+    display_update();
+    delay(100000);
+  }
+
+  return 0;
+}
+
