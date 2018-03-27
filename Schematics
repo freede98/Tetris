@@ -1,0 +1,14 @@
+Screen
+_____________               Button_1  Turn_Clockwise
+[           ]
+[           ]               Button_2  Jump_Right
+[           ]
+[           ]               Button_3  Jump_Left
+[           ]
+[           ]               Buttonn_4 Drop_down
+[           ]
+[           ]
+[___________]
+
+Theory:   18 X 10
+Practice: 18 X 10 (?) with blocks of 2x2 pixels (?)
