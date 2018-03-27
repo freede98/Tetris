@@ -3,6 +3,8 @@ void agetime(int life)
 	initialise_timer();
 	int y = 1;
 	int timecounter = 0;
+	char a;
+	char b;
 
 	char* lifetime = age;
 
@@ -16,15 +18,24 @@ void agetime(int life)
 				}
 
 	  	*lifetime = (char) y + 48;
-
-			if(timecounter = 0x6)
+			if(timecounter = 0x4e)
 				{
 				 display_string(2, lifetime);
-				 display_update();
+				 display_string(3, "points 12");
+				 delay(9999900);
+				 volatile int* switches = (volatile int*) getsw();
+				 if (!(*switches & 0x1))
+					 {
+						 display_string(0, "");
+						 display_string(1, "");
+						 display_string(2, "");
+						 display_string(3, "");
+						 main();
+					 }
+
 				 timecounter = 0;
 				}
-			y++;
-		 }
-
-   return;
-}
+				y++;
+			}
+			 return;
+		}
