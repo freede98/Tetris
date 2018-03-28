@@ -1,18 +1,101 @@
 #include <pic32mx.h>
 #include <stdint.h>
 
-int gameover(){
+char print[16];
+
+void convertToChar (char* letters,int number)
+{
+  int i = 0;
+
+  while (i < 16)
+  {
+    print[i] = ' ';
+    i++;
+  }
+
+  i = 0;
+  int stop = 0;
+
+  while (*letters && stop < 2){
+    print[i] = *letters;
+    if(*letters == (char) 32)
+      stop++;
+    i++;
+    letters++;
+  }
+
+  int size = number / 10;
+
+  while (size > 0){
+    size = size / 10;
+    i++;
+  }
+
+  int carry = 0;
+  do{carry = number / 10;
+    print[i] = (char) ((number % 10) + 48);
+    i--;
+    number = carry;
+  } while( number != 0 );
+}
+
+void switchname (char* name1, char* name2) {
+   /* value */
+}
+
+int interface(int foodCounter, int age, int weight, int score)
+{
+	display_init();
+  convertToChar("food: ", foodCounter);
+  display_string(0, print);
+  convertToChar("weight(hg): ", weight);
+	display_string(1, print);
+  convertToChar("age: ", age);
+	display_string(2, print);
+  convertToChar("score: ", score);
+	display_string(3, print);
+	display_update();
+
+  while(1){
+    volatile int* switches = (volatile int*) getsw();
+    if(!(*switches & 0x1)){
+      display_string(0, "");
+    	display_string(1, "");
+    	display_string(2, "");
+    	display_string(3, "");
+      tama(foodCounter,weight,age,score);
+    }
+  }
+
+	for(;;) ;
+	return 0;
+}
+
+int gameover(int score3){
+  convertToChar("Score: ", score3);
   display_init();
   display_string(0, "GAME OVER");
-  display_string(1, "25");
+  display_string(1, print);
   display_update();
-  delay(100000);
+  delay(10000000);
 
   char alphabet[4][16] = {
   {'>','A',' ','B',' ','C',' ','D',' ','E',' ','F',' ','G',' ','H'},
   {' ','I',' ','J',' ','K',' ','L',' ','M',' ','N',' ','O',' ','P'},
   {' ','Q',' ','R',' ','S',' ','T',' ','U',' ','V',' ','W',' ','X'},
   {' ','Y',' ','Z',' ',' ',' ',' ',' ',' ',' ','_',' ','_',' ','_'}};
+
+  char name1[4] = {'I','K','E',':'};
+
+  char name2[4] = {'A','B','E',':'};
+
+  char name3[4] = {' ',' ',' ',':'};
+
+  //char* name1p = &name1;
+
+  //char* name2p = &name2;
+
+  //char* name3p = &name3;
 
   int y = 0;
   int x = 0;
@@ -31,34 +114,60 @@ int gameover(){
       alphabet[y][x+2] = ' ';
       delay(500000);
     }
-    if (*buttons & 0x1 && x < 14){
+
+    if (*buttons & 0x1 && ((x < 14 && y < 3) || (y == 3 && x < 2))){
       x += 2;
       alphabet[y][x] = '>';
       alphabet[y][x-2] = ' ';
       delay(500000);
     }
-    if (*buttons & 0x4 && y < 3){
+
+    if (*buttons & 0x2 && (( y < 2) || (x < 4 && y < 3))){
       y++;
       alphabet[y][x] = '>';
       alphabet[y-1][x] = ' ';
       delay(500000);
     }
-    if (*buttons & 0x2 && y > 0){
+    if (*buttons & 0x4 && y > 0){
       y--;
       alphabet[y][x] = '>';
       alphabet[y+1][x] = ' ';
       delay(500000);
     }
-    if (*switches & 0x4){
+    if (*switches & 0x8){
       alphabet[3][pos] = alphabet[y][x+1];
       pos += 2;
-      while(*switches & 0x4)
+      while(*switches & 0x8)
         switches = (volatile int*)getsw();
     }
     display_update();
     delay(100000);
   }
 
+  name3[0] = alphabet[3][11];
+  name3[1] = alphabet[3][13];
+  name3[2] = alphabet[3][15];
+  int score1 = 1000;
+  int score2 = 800;
+
+  if(score3 > score2)
+  {
+    switchname(name3, name2);
+  }
+  if(score2 > score1)
+  {
+    switchname(name2, name1);
+  }
+
+  display_string(0, name3);
+  display_string(1, print);
+  display_string(2, "");
+  display_string(3, "");
+  display_update();
+  delay(10000000);
+  display_string(0, "");
+  display_string(1, "");
+  tama(5,0,0,0);
+
   return 0;
 }
-
