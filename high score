@@ -1,0 +1,23 @@
+void highscore(int score)
+{
+  //convertToChar();
+  display_init();
+  display_string(0, "High Score");
+
+  convertToChar("#1:", score);
+  display_string(1, foo);
+  display_update();
+
+  while(1){
+    volatile int* switches = (volatile int*) getsw();
+    if(!(*switches & 0x2)){
+      display_string(0, "");
+    	display_string(1, "");
+    	display_string(2, "");
+    	display_string(3, "");
+      main();
+    }
+}
+	for(;;) ;
+	return;
+}
