@@ -18,8 +18,10 @@ void convertToChar (char* letters,int number)
 
   while (*letters && stop < 2){
     print[i] = *letters;
-    if(*letters == (char) 32)
+    if(*letters == ' ')
       stop++;
+    else
+      stop = 0;
     i++;
     letters++;
   }
@@ -32,7 +34,8 @@ void convertToChar (char* letters,int number)
   }
 
   int carry = 0;
-  do{carry = number / 10;
+  do{
+    carry = number / 10;
     print[i] = (char) ((number % 10) + 48);
     i--;
     number = carry;
@@ -40,7 +43,16 @@ void convertToChar (char* letters,int number)
 }
 
 void switchname (char* name1, char* name2) {
-   /* value */
+   char t;
+   int i = 0;
+   while(i < 3){
+     i++;
+     t = *name1;
+     *name1 = *name2;
+     *name2 = t;
+     name1++;
+     name2++;
+   }
 }
 
 int interface(int foodCounter, int age, int weight, int score)
@@ -85,17 +97,13 @@ int gameover(int score3){
   {' ','Q',' ','R',' ','S',' ','T',' ','U',' ','V',' ','W',' ','X'},
   {' ','Y',' ','Z',' ',' ',' ',' ',' ',' ',' ','_',' ','_',' ','_'}};
 
-  char name1[4] = {'I','K','E',':'};
+  char name1[5] = {'I','K','E',':',' '};
+  char name2[5] = {'A','B','E',':',' '};
+  char name3[5] = {' ',' ',' ',':',' '};
+  int score1 = 1000;
+  int score2 = 800;
 
-  char name2[4] = {'A','B','E',':'};
-
-  char name3[4] = {' ',' ',' ',':'};
-
-  //char* name1p = &name1;
-
-  //char* name2p = &name2;
-
-  //char* name3p = &name3;
+  //char name[3][4] = {{'I','K','E',':'},{'A','B','E',':'},{' ',' ',' ',':'}};
 
   int y = 0;
   int x = 0;
@@ -147,26 +155,34 @@ int gameover(int score3){
   name3[0] = alphabet[3][11];
   name3[1] = alphabet[3][13];
   name3[2] = alphabet[3][15];
-  int score1 = 1000;
-  int score2 = 800;
 
   if(score3 > score2)
   {
     switchname(name3, name2);
+    int s = score3;
+    score3 = score2;
+    score2 = s;
   }
   if(score2 > score1)
   {
     switchname(name2, name1);
+    int s = score2;
+    score2 = score1;
+    score1 = s;
   }
-
-  display_string(0, name3);
+  //display_init();
+  convertToChar(name1, score1);
   display_string(1, print);
+  convertToChar(name2, score2);
+  display_string(2, print);
+  convertToChar(name3, score3);
+  display_string(3, print);
+  display_string(0, "");
+  display_update();
+  delay(50000000);
+  display_string(1, "");
   display_string(2, "");
   display_string(3, "");
-  display_update();
-  delay(10000000);
-  display_string(0, "");
-  display_string(1, "");
   tama(5,0,0,0);
 
   return 0;
