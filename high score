@@ -1,6 +1,5 @@
 void highscore(int score)
 {
-  //convertToChar();
   display_init();
   display_string(0, "High Score");
 
