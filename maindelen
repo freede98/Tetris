@@ -27,11 +27,14 @@ int delayBurger = 0;
 int tickdownFood = 0;
 int tickupAge = 0;
 int tickdownWeight = 0;
-int foodCounter = 5;
-int age = 0;
-int weight = 0;
-int score = 0;
+int movetoscore = 0;
+int foodCounter;
+int age;
+int weight;
+int score;
 int overfeed = 0;
+int poop = 0;
+char showPoop = '0';
 
 char textbuffer[4][16];
 
@@ -177,14 +180,9 @@ static const uint8_t const font[] = {
 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,};*/
 
-//straight-line = 0		 smiley = 1			neutral = 2			angry = 3
+//smiley = 0			neutral = 1			angry = 2
 
 const uint8_t const emoticon[][64] = {
-{0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,},
-
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 0x3f, 0xcf, 0xf7, 0xfb, 0xed, 0xd5, 0xee, 0xfe, 0xfe, 0xee, 0xd5, 0xed, 0xfb, 0xf7, 0xcf, 0x3f,
@@ -206,6 +204,30 @@ const uint8_t const hamburger[] =
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 0xff, 0xcf, 0x87, 0x4b, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4b, 0x87, 0xcf, 0xff,
 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff, 0xff, 0xff,0xff,0xff,0xff,0xff,0xff,0xff};
+
+const uint8_t const lineimage[] =
+{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0};
+
+const uint8_t const egg[] =
+{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0x7f, 0x9f, 0xef, 0xf7, 0xfb, 0xfb, 0xfd, 0xfd, 0xfb, 0xfb, 0xf7, 0xef, 0x9f, 0x7f, 0xff,
+0xff, 0xfe, 0xf9, 0xe7, 0xdf, 0xbf, 0x7f, 0x7f, 0x7f, 0x7f, 0xbf, 0xdf, 0xe7, 0xf9, 0xfe, 0xff};
+
+const uint8_t const crackegg[] =
+{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0x73, 0xbd, 0xcf, 0x3f, 0xf3, 0x97, 0xff, 0xff, 0x3d, 0xd9, 0x9f, 0xef, 0x9f, 0x79, 0xff,
+0xff, 0xfe ,0xf9, 0xe7, 0xdf ,0xbe ,0x7d, 0x7d, 0x7e, 0x7f, 0xbf ,0xdf, 0xe7 ,0xf9 ,0xfe, 0xff};
+
+const uint8_t const poo[] =
+{0xff, 0xf7, 0xcf, 0xbf, 0x4e, 0x49, 0x0f, 0x09, 0x3e, 0x2b, 0x75, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xf9, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf9, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,};
 
 void delay(int cyc) {
 	int i;
@@ -271,7 +293,7 @@ void display_image(int x, const uint8_t *data) {
 
 	for(i = 0; i < 4; i++) {
 		DISPLAY_COMMAND_DATA_PORT &= ~DISPLAY_COMMAND_DATA_MASK;
-		if(data == emoticon[0] || data == hamburger){
+		if(data == lineimage || data == hamburger || data == poo){
 			spi_send_recv(0x22);
 			spi_send_recv(i); }
 
@@ -337,13 +359,19 @@ int getsw( void ){
 }
 
 
-
-void tama(void){
-	display_init();
+void tama(int exfood, int exkg, int exage, int expts){
+	foodCounter = 0 + exfood;
+	weight = 0 + exkg;
+	age = 0 + exage;
+	score = 0 + expts;
+	display_string(0, "            TAMA");
+	display_string(1, "            s1:P");
+	display_string(2, "            s3:c");
+	display_string(3, "            s4:f");
 	display_update();
 	int cheattimer = 0;
 	int cheatstep = 0;
-	int i = 64;
+	int i = 40;
 	T2CONSET |= 0x8000;
 	while(1) {
 	volatile int* push_buttons = (volatile int*) getbtns();
@@ -361,45 +389,50 @@ void tama(void){
 			IFS(0) = 0;
 		}
 
-	if(tickdownFood > 10000 && foodCounter > 0){
+	if(tickdownFood > 200){
 		foodCounter--;
 		tickdownFood = 0;
 	}
 
-	if(tickupAge > 1000){
+	if(tickupAge > 400){
 		age++;
+		score++;
 		tickupAge = 0;
 	}
 
-	if(tickdownWeight > 100 && weight > 0)
+	if(tickdownWeight > 50 && weight > 0)
 	{
 		weight--;
 		tickdownWeight = 0;
 		score++;
 	}
 
-	//line = 0		smiley = 1			neutral = 2			angry = 3
-	if(1)
-		display_image(47, emoticon[0]);
-		emoindex = 1;
+	//smiley = 1			neutral = 2			angry = 3
+	display_image(88, lineimage);
+	emoindex = 0;
 
 	if(!(*porte & 0x10))
+		emoindex = 1;
+
+	if(!(*porte & 0x4))
 		emoindex = 2;
 
-	if(!(*porte & 0x2))
-		emoindex = 3;
-
-	if(!(*push_buttons & 0x8) && !(*push_buttons & 0x1) && timecounter > 14)
+	if(/*!(*push_buttons & 0x8) && !(*push_buttons & 0x1)*/
+	!(*push_buttons & 0x9) && timecounter > 14)
 	{
 		*porte = *porte >> 1;
 		timecounter = 0;
 	}
 
-	if((*push_buttons & 0x9) && (movement > 0) &&  timecounter > 4 && *porte < 0xff)
+	if(((*push_buttons & 0x9) || (movement > 0)) &&  timecounter > 4)
 	{
-		*porte = (*porte << 1) + 0x1;
+		if(*porte < 0xff){
+			*porte = (*porte << 1) + 0x1;
+			score += ++movetoscore / 10;
+			movetoscore = movetoscore % 10;
+			tickdownWeight++;
+		}
 		timecounter = 0;
-		tickdownWeight++;
 	}
 
 	display_image(i, emoticon[emoindex]);
@@ -407,8 +440,8 @@ void tama(void){
 	{
 		display_image(i, emoticon[emoindex]);
 		delay(50000);
-		if(i < 47)
-			i = 128;
+		if(i < 1)
+			i = 87;
 		else
 			i--;
 		display_update();
@@ -418,8 +451,8 @@ void tama(void){
 	{
 		display_image(i, emoticon[emoindex]);
 		delay(50000);
-		if(i > 128)
-			i = 47;
+		if(i > 87)
+			i = 1;
 		else
 			i++;
 		display_update();
@@ -428,7 +461,7 @@ void tama(void){
 	if(*push_buttons & 0x4 && writeRow < 2)
 	{
 		writeRow++;
-		movement = 100;
+		movement = 4;
 		delay( 500000 );
 		display_update();
 	}
@@ -436,80 +469,114 @@ void tama(void){
 	if(*push_buttons & 0x2 && writeRow > 0)
 	{
 		writeRow--;
-		movement = 100;
+		movement = 4;
 		delay( 500000 );
 		display_update();
 	}
 
 	if(*switches & 0x8)
-		delayBurger = 10000;
+		delayBurger = 100;
 
 	if(delayBurger > 0 && !(*switches & 0x8))
-		display_image(112, hamburger);
+		display_image(8, hamburger);
 
-	if((writeRow == 0) && (i == 112) && delayBurger > 0){
+	if((writeRow == 0) && (i == 8) && delayBurger > 0){
 		delayBurger = 0;
 		foodCounter++;
 		weight++;
 		if( overfeed < 0)
 			score++;
 		overfeed = 10;
+		poop++;
 	}
 
-//cheatcode
-/*	if(*push_buttons == 0x4 && (cheatstep == 0 || cheatstep == 1))
-		cheattimer = 100;
-	//else if(*push_buttons == 0x4 && (cheatstep == 0 || cheatstep == 1))
+	if(poop > 4)
+		display_image(79, poo);
 
-	if(!(*push_buttons & 0x4) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
+	if(*switches & 0x4){
+		if(poop > 4 && showPoop == '1')
+			poop = 0;
+		showPoop = '0';}
 
-	if(*push_buttons & 0x2 && (cheatstep == 2 || cheatstep == 3))
-		cheattimer = 100;
+	if(!(*switches & 0x4) && showPoop == '0')
+		showPoop = '1';
 
-	if(!(*push_buttons & 0x2) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
+	if ((*push_buttons || *switches) && cheattimer < 1)
+		switch (cheatstep) {
+			case 0:if(*push_buttons & 0x4)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
 
-	if(*push_buttons & 0x8 && (cheatstep == 4 || cheatstep == 6))
-		cheattimer = 100;
+			case 1:if(*push_buttons & 0x4)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
 
-	if(!(*push_buttons & 0x8) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
+			case 2:if(*push_buttons & 0x2)
+								cheattimer = 100;
+							else if(*push_buttons & 0x4)
+								cheatstep = 2;
+							else
+								cheatstep = 0;
+							break;
 
-	if(*push_buttons & 0x1 && (cheatstep == 5 || cheatstep == 7))
-		cheattimer = 100;
+			case 3:if(*push_buttons & 0x2)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
 
-	if(!(*push_buttons & 0x8) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
+			case 4:if(*push_buttons & 0x8)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
+			case 5:if(*push_buttons & 0x1)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
+			case 6:if(*push_buttons & 0x8)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+						break;
+			case 7:if(*push_buttons & 0x1)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+						break;
+			case 8:if(*switches & 0x8)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
+			case 9:if(*switches & 0x4)
+								cheattimer = 100;
+							else
+								cheatstep = 0;
+							break;
+			//default: cheatstep = 0;
+		}
+		if(!(*switches) && !(*push_buttons) && cheattimer > 0){
+			cheattimer = 0;
+			cheatstep++;
+		}
 
-	if(*switches & 0x8 && (cheatstep == 8))
-		cheattimer = 100;
-
-	if(!(*switches & 0x8) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
-
-	if(*switches & 0x4 && (cheatstep == 9))
-		cheattimer = 100;
-
-	if(!(*switches & 0x4) && cheattimer > 0){
-		cheattimer = 0;
-		cheatstep++;}
-
-	if(cheatstep == 10)
-		interface();*/
-
+		if(cheatstep == 10 /*|| *switches & 0x4*/){
+			T2CONSET &= ~0x8000;
+			cheatface(foodCounter, weight, age, score);
+		}
 
 	if(*switches & 0x1){
 		T2CONSET &= ~0x8000;
 		interface(foodCounter, age, weight, score);
 	}
 
-	if(*switches & 0x2 ||	(age > 29 || weight > 24 || foodCounter < 1)){
+	if(/**switches & 0x2 ||	*/(age > 29 || weight > 49 || foodCounter < 1)){
 		gameover(score);
 	}
 
@@ -556,7 +623,15 @@ int main(void) {
 	SPI2CONSET = 0x8000;
 
 initialise_timer();
-tama();
+display_init();
+display_update();
+display_image(44, egg);
+delay(15000000);
+display_image(44, crackegg);
+delay(15000000);
+display_image(44, emoticon[0]);
+delay(15000000);
+tama(5,0,0,0);
 
 	for(;;) ;
 	return 0;
