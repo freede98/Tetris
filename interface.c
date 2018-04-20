@@ -39,19 +39,6 @@ void convertToChar (char* letters, int number)
   } while( number != 0 );
 }
 
-void switchname (char* name1, char* name2) {
-   char t;
-   int i = 0;
-   while(i < 3){
-     i++;
-     t = *name1;
-     *name1 = *name2;
-     *name2 = t;
-     name1++;
-     name2++;
-   }
-}
-
 int interface(int foodCounter, int age, int weight, int score)
 {
 	display_init();
